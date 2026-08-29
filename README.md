@@ -1,34 +1,38 @@
 # IDM Activation Script / IDM Toolbox
 
-This repository is being maintained again as a modern **IDM diagnostics, update, integrity-check, and troubleshooting toolbox**.
+[![Toolbox CI](https://github.com/Becauseiloveyo/IDM-Activation-Script/actions/workflows/toolbox-ci.yml/badge.svg)](https://github.com/Becauseiloveyo/IDM-Activation-Script/actions/workflows/toolbox-ci.yml)
 
-The original `IAS.cmd` activation/freeze/reset implementation is preserved as legacy code. The current modernization work intentionally does **not** modify those internals.
+This repository is maintained again as a modern **IDM diagnostics, update, integrity-check, and troubleshooting toolbox**.
+
+The original `IAS.cmd` activation/freeze/reset implementation is preserved as separate legacy code. The current modernization work intentionally does **not** modify those internals.
 
 ## Current status
 
 - **Maintained toolbox:** `IDM-Toolbox.cmd` v2.0.0
 - **Legacy activation engine:** `IAS.cmd` v1.2
 - **Supported Windows:** Windows 7/8/8.1/10/11 and corresponding Server editions where Windows PowerShell is available
-- **Current official IDM release at project restart:** 6.43 Build 10, released 20-Aug-2026
-- **Official release history:** <https://www.internetdownloadmanager.com/news.html>
+- **Latest IDM compatibility:** resolved from the official IDM release page at runtime rather than hard-coded in the project
+- **Release notes:** [IDM Toolbox v2.0.0](RELEASE_NOTES_v2.0.0.md)
+- **Changelog:** [CHANGELOG.md](CHANGELOG.md)
 
-The toolbox retrieves the current IDM release from the official IDM news page at runtime, so it does not depend on a hard-coded version number.
+Official IDM release history: <https://www.internetdownloadmanager.com/news.html>
 
 ## What was modernized
 
-`IDM-Toolbox.cmd` adds a maintained front end for the parts of the project that do not depend on activation logic:
+`IDM-Toolbox.cmd` provides the maintained front end for the parts of the project that do not depend on activation logic:
 
 - Detects the installed IDM executable from the registry and standard install paths
 - Reports Windows version, build, architecture, PowerShell version, IDM file version, and IDM registry version
-- Checks the latest official IDM version over HTTPS
-- Compares the installed IDM build with the current official build when the version formats can be normalized
+- Retrieves the latest official IDM version over HTTPS
+- Compares the installed IDM build with the current official build when version formats can be normalized
 - Verifies Authenticode signatures for core IDM executables and integration DLLs
 - Checks DNS, TCP/443, HTTPS, WinHTTP proxy, user proxy, and proxy environment variables
 - Diagnoses Chrome, Edge, and Firefox integration prerequisites
 - Searches native-messaging registry locations used by Chromium/Firefox integrations
-- Generates a diagnostic report without including serial/license values
+- Generates a diagnostic report without serial/license values
 - Downloads the official IDM installer and verifies both its Authenticode status and Tonec publisher before offering to launch it
 - Provides non-interactive `/check`, `/diag`, `/download`, `/help`, and `/selftest` modes
+- Runs a Windows CI self-test on repository changes
 
 ## Quick start
 
@@ -38,7 +42,7 @@ Download or clone the repository, then run:
 IDM-Toolbox.cmd
 ```
 
-No administrator elevation is required for the normal diagnostic functions.
+No administrator elevation is required for normal diagnostic functions.
 
 ### Command-line modes
 
@@ -95,14 +99,14 @@ The browser diagnostics check:
 - Native-messaging registry entries containing IDM-related names
 - Browser/integration-related values under `HKCU\Software\DownloadManager`
 
-For official integration repair guidance, use:
+Official integration repair guidance:
 
-- Chrome / Chromium integration: <https://www.internetdownloadmanager.com/register/new_faq/bi9.html>
-- Firefox integration: <https://www.internetdownloadmanager.com/register/new_faq/bi4.html>
+- Chrome / Chromium: <https://www.internetdownloadmanager.com/register/new_faq/bi9.html>
+- Firefox: <https://www.internetdownloadmanager.com/register/new_faq/bi4.html>
 
 ## Network diagnostics
 
-The legacy IAS code used ping and TCP port 80 as its primary connectivity fallback. The maintained toolbox instead checks the transport path that modern IDM services actually depend on:
+The legacy IAS code used ping and TCP port 80 as its primary connectivity fallback. The maintained toolbox instead checks the transport path used by modern web services:
 
 - DNS resolution
 - TCP 443
@@ -117,11 +121,15 @@ This avoids treating blocked ICMP/ping as a failed Internet connection.
 
 ```text
 IDM-Activation-Script/
-├─ IAS.cmd                 Legacy IAS v1.2 activation/freeze/reset code
-├─ IDM-Toolbox.cmd         Maintained diagnostics/update/integrity toolbox
+├─ IAS.cmd                         Legacy IAS v1.2 activation/freeze/reset code
+├─ IDM-Toolbox.cmd                 Maintained diagnostics/update/integrity toolbox
 ├─ README.md
+├─ RELEASE_NOTES_v2.0.0.md
 ├─ CHANGELOG.md
 ├─ VERSION
+├─ .github/
+│  └─ workflows/
+│     └─ toolbox-ci.yml
 ├─ .gitattributes
 └─ .gitignore
 ```
@@ -136,7 +144,7 @@ That separation is intentional: non-activation maintenance can continue independ
 
 ### IDM is not detected
 
-Confirm that `IDMan.exe` exists in one of the normal installation paths or that this registry value points to the executable:
+Confirm that `IDMan.exe` exists in a normal installation path or that this registry value points to the executable:
 
 ```text
 HKCU\Software\DownloadManager\ExePath
@@ -144,13 +152,7 @@ HKCU\Software\DownloadManager\ExePath
 
 ### Latest-version check fails
 
-Run menu option **4 - Network / proxy diagnostics**. Common causes include:
-
-- DNS failure
-- HTTPS interception
-- VPN/proxy configuration
-- TLS inspection software
-- blocked access to `internetdownloadmanager.com`
+Run menu option **4 - Network / proxy diagnostics**. Common causes include DNS failure, HTTPS interception, VPN/proxy configuration, TLS inspection software, or blocked access to `internetdownloadmanager.com`.
 
 ### Signature verification fails
 
@@ -167,7 +169,7 @@ Original project references:
 
 Additional original credits listed by IAS include Dukun Cabul, AveYo/BAU, and abbodi1406.
 
-## Maintenance notes
+## Maintenance policy
 
 The maintained code should prefer:
 
@@ -176,6 +178,4 @@ The maintained code should prefer:
 - Authenticode verification for downloaded executables
 - Read-only diagnostics before repair/reinstallation recommendations
 - Explicit exclusion of serial/license values from generated reports
-- Separate maintenance code from the legacy activation implementation
-
-See [CHANGELOG.md](CHANGELOG.md) for the restart history.
+- Separation of maintained diagnostics from the legacy activation implementation
