@@ -1,0 +1,33 @@
+name: Toolbox CI
+
+on:
+  push:
+    paths:
+      - "IDM-Toolbox.cmd"
+      - "VERSION"
+      - ".github/workflows/toolbox-ci.yml"
+  pull_request:
+    paths:
+      - "IDM-Toolbox.cmd"
+      - "VERSION"
+      - ".github/workflows/toolbox-ci.yml"
+
+jobs:
+  selftest:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run non-destructive CMD self-test
+        shell: cmd
+        run: IDM-Toolbox.cmd /selftest
+
+      - name: Verify VERSION matches toolbox
+        shell: powershell
+        run: |
+          $expected = (Get-Content VERSION -Raw).Trim()
+          $line = Select-String -Path IDM-Toolbox.cmd -Pattern '^set "toolboxver=([^"]+)"$' | Select-Object -First 1
+          if (-not $line) { throw "toolboxver was not found" }
+          $actual = $line.Matches[0].Groups[1].Value
+          if ($actual -ne $expected) { throw "VERSION=$expected but toolboxver=$actual" }
+          Write-Host "Version synchronized: $actual"

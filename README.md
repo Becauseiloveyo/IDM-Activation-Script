@@ -1,149 +1,181 @@
-# Notice:
+# IDM Activation Script / IDM Toolbox
 
-## This project has been archived and is no longer being maintained.
+This repository is being maintained again as a modern **IDM diagnostics, update, integrity-check, and troubleshooting toolbox**.
 
-I've switched to FDM, don't want to keep up with IDM new nags anymore.
+The original `IAS.cmd` activation/freeze/reset implementation is preserved as legacy code. The current modernization work intentionally does **not** modify those internals.
 
-------------------------------------------------------------------------
+## Current status
 
-## IDM Activation Script
+- **Maintained toolbox:** `IDM-Toolbox.cmd` v2.0.0
+- **Legacy activation engine:** `IAS.cmd` v1.2
+- **Supported Windows:** Windows 7/8/8.1/10/11 and corresponding Server editions where Windows PowerShell is available
+- **Current official IDM release at project restart:** 6.43 Build 10, released 20-Aug-2026
+- **Official release history:** <https://www.internetdownloadmanager.com/news.html>
 
-An open-source tool to activate and reset the trial of [Internet Download Manager](https://www.internetdownloadmanager.com/)
+The toolbox retrieves the current IDM release from the official IDM news page at runtime, so it does not depend on a hard-coded version number.
 
-## Features
+## What was modernized
 
--   IDM freeze trial and activation with registry key lock method
--   Activation and trial persist even after installing IDM updates
--   IDM trial reset
--   Fully open source
--   Based on the transparent batch script
+`IDM-Toolbox.cmd` adds a maintained front end for the parts of the project that do not depend on activation logic:
 
-## IAS Latest Release
+- Detects the installed IDM executable from the registry and standard install paths
+- Reports Windows version, build, architecture, PowerShell version, IDM file version, and IDM registry version
+- Checks the latest official IDM version over HTTPS
+- Compares the installed IDM build with the current official build when the version formats can be normalized
+- Verifies Authenticode signatures for core IDM executables and integration DLLs
+- Checks DNS, TCP/443, HTTPS, WinHTTP proxy, user proxy, and proxy environment variables
+- Diagnoses Chrome, Edge, and Firefox integration prerequisites
+- Searches native-messaging registry locations used by Chromium/Firefox integrations
+- Generates a diagnostic report without including serial/license values
+- Downloads the official IDM installer and verifies both its Authenticode status and Tonec publisher before offering to launch it
+- Provides non-interactive `/check`, `/diag`, `/download`, `/help`, and `/selftest` modes
 
-Last Release - v1.2 (12-Feb-2024)\
-[GitHub](https://github.com/WindowsAddict/IDM-Activation-Script) - [BitBucket](https://bitbucket.org/WindowsAddict/idm-activation-script/)
+## Quick start
 
-## Download / How to use it?
+Download or clone the repository, then run:
 
--   First fresh install [Internet Download Manager](https://www.internetdownloadmanager.com/). Make sure previous cracks/patches are removed/uninstalled if there are any.
--   After that follow the below steps to activate it.
+```bat
+IDM-Toolbox.cmd
+```
 
-## Note
+No administrator elevation is required for the normal diagnostic functions.
 
--   📌 The activation option is currently not working in the script, use the Freeze trial option to lock 30-day trial period for the lifetime.
+### Command-line modes
 
-### Method 1 - PowerShell
+```text
+IDM-Toolbox.cmd /check
+IDM-Toolbox.cmd /diag
+IDM-Toolbox.cmd /download
+IDM-Toolbox.cmd /selftest
+IDM-Toolbox.cmd /help
+```
 
-(Recommended)
+`/diag` writes a timestamped report to the Windows Desktop. The report intentionally excludes serial/license data.
 
--   Right-click on the Windows start menu and select PowerShell or Terminal (Not CMD).
--   Copy-paste the below code and press enter\
-    `irm https://massgrave.dev/ias | iex`
--   You will see the activation options, follow the on-screen instructions.
--   That's all.
+## Main menu
 
-### Method 2 - Traditional
+```text
+[1] IDM / Windows status
+[2] Check latest official IDM version
+[3] Verify IDM file signatures
+[4] Network / proxy diagnostics
+[5] Browser integration diagnostics
+[6] Generate diagnostic report
+[7] Download official IDM installer
+[8] Open legacy IAS.cmd
+[9] Official IDM / project links
+[0] Exit
+```
 
--   Download the file from [GitHub](https://github.com/WindowsAddict/IDM-Activation-Script/archive/refs/heads/main.zip) or [Bitbucket](https://bitbucket.org/WindowsAddict/idm-activation-script/get/main.zip)
--   Right-click on the downloaded zip file and extract
--   In the extracted folder, run the file named `IAS.cmd`
--   You will see the activation options, and follow onscreen instructions.
--   That's all.
+## Installer verification
 
-## Info
+The toolbox downloads the installer only from:
 
-#### Freeze Trial
+<https://www.internetdownloadmanager.com/transfer/download.html>
 
--   IDM provides a 30-day trial period, you can use this option in the script to lock this trial period for the lifetime so that you won't have to reset the trial again and your trial won't expire.
--   This method requires the Internet at the time of applying this option.
--   IDM updates can be installed directly without having to freeze it again.
+Before it offers to launch the downloaded file, it checks:
 
-#### Activation
+1. Windows Authenticode status is `Valid`.
+2. The signing certificate subject contains `Tonec`.
+3. The SHA-256 hash is displayed for inspection/logging.
 
-(\*Currently not working)
+If publisher/signature validation fails, the file is not launched automatically.
 
--   This script applies the registry lock method to activate the Internet download manager (IDM).
--   This method requires the Internet at the time of activation.
--   IDM updates can be installed directly without having to activate it again.
--   After the activation, if in some cases, IDM starts to show an activation nag screen, then just run the activation option again without using the reset option.
+## Browser integration diagnostics
 
-#### Reset IDM Activation / Trial
+The browser diagnostics check:
 
--   Internet download manager provides a 30-day trial period, you can use this script to reset this Activation / Trial period whenever you want.
--   This option also can be used to restore status if in case IDM reports a fake serial key and other similar errors.
+- IDM installation path
+- `IDMMsgHost.exe`
+- `IDMIECC.dll`
+- `IDMGetAll.dll`
+- Chrome installation
+- Edge installation
+- Firefox installation
+- Native-messaging registry entries containing IDM-related names
+- Browser/integration-related values under `HKCU\Software\DownloadManager`
 
-#### OS requirement
+For official integration repair guidance, use:
 
--   The project is supported for Windows 7/8/8.1/10/11 and their Server equivalent.
--   The PowerShell method to run IAS is supported on Windows 8 and higher.
+- Chrome / Chromium integration: <https://www.internetdownloadmanager.com/register/new_faq/bi9.html>
+- Firefox integration: <https://www.internetdownloadmanager.com/register/new_faq/bi4.html>
 
-#### Advanced Info
+## Network diagnostics
 
--   To activate in unattended mode, run the script with the `/act` parameter.
--   To freeze the trial in unattended mode, run the script with the `/frz` parameter.
--   To reset in unattended mode, run the script with the `/res` parameter.
+The legacy IAS code used ping and TCP port 80 as its primary connectivity fallback. The maintained toolbox instead checks the transport path that modern IDM services actually depend on:
 
-## How does it work?
+- DNS resolution
+- TCP 443
+- HTTPS request to the official IDM site
+- WinHTTP proxy
+- Windows user proxy configuration
+- `HTTP_PROXY` / `HTTPS_PROXY` environment variables
 
--   IDM stores the data related to trial and activation across various registry keys. Some of these keys are locked to protect them from tampering and data is stored in a pattern to track the fake serial issue and the remaining trial days. To activate it, the script here simply generates those registry keys by triggering a few downloads in IDM, identifies those registry keys, and locks them so IDM can't edit and view them. That way IDM cannot show the warning that it's activated with a fake serial key.
+This avoids treating blocked ICMP/ping as a failed Internet connection.
 
-## Troubleshoot
+## Project structure
 
--   Browser Integration Fix: [Chrome](https://www.internetdownloadmanager.com/register/new_faq/bi9.html) - [Firefox](https://www.internetdownloadmanager.com/register/new_faq/bi4.html)
--   Raise the issue on [Github](https://github.com/WindowsAddict/IDM-Activation-Script) with screenshots.
+```text
+IDM-Activation-Script/
+├─ IAS.cmd                 Legacy IAS v1.2 activation/freeze/reset code
+├─ IDM-Toolbox.cmd         Maintained diagnostics/update/integrity toolbox
+├─ README.md
+├─ CHANGELOG.md
+├─ VERSION
+├─ .gitattributes
+└─ .gitignore
+```
 
-## Changelog
+## Legacy IAS.cmd
 
-#### v1.2
+`IAS.cmd` remains the original WindowsAddict IAS v1.2-derived implementation. Its activation-related sections have deliberately not been rewritten as part of this maintenance restart.
 
--   Added back activation option with a randomized name, email, and key in registration details along with a warning that it's not working for some users, the recommended option is to use Freeze trial.
+That separation is intentional: non-activation maintenance can continue independently without accidentally changing the legacy activation behavior.
 
-#### v1.1
+## Troubleshooting
 
--   IDM update 6.42b3 has started showing fake serial popups with IAS activation, due to this we have removed the activation option and replaced it with the Freeze trial option to lock the 30-day trial period for the lifetime.
--   Now the script will disable quick-edit in CMD windows using Powershell instead of editing registry, thanks to @abbodi1406 for the code and @awuctl for the idea.
--   Code to relaunch script with conhost.exe to avoid terminal app is now merged in quick-edit disable code, thanks to @abbodi1406.
+### IDM is not detected
 
-#### v1.0
+Confirm that `IDMan.exe` exists in one of the normal installation paths or that this registry value points to the executable:
 
--   Added the code to relaunch the script with conhost.exe if the script is running from the terminal app.
--   Fixed an issue in getting the current user account SID.
+```text
+HKCU\Software\DownloadManager\ExePath
+```
 
-#### v0.9
+### Latest-version check fails
 
--   Fixed an issue where the script can not activate and reset IDM in non-admin user accounts.
--   Fixed an issue where the script incorrectly shows that IDM is activated.
--   Fixed an issue where a fake serial pop-up may appear. The script will also show the info to run the activation option again without using the reset option.
--   Fixed an issue where Powershell code to launch IAS may not work due to GitHub block in some regions. It will use the new [BitBucket](https://bitbucket.org/WindowsAddict/idm-activation-script/) repo as a fallback link.
--   IDM registry scanning and locking code is now written in Powershell.
--   The script update checker code is added to the script.
--   The script will now disable quick edit mode temporarily because users often click inside the script window and it pauses the script.
--   The script will back up the CLSISD registry keys before performing operations on them.
--   Many error checks are added to better identify the issues.
+Run menu option **4 - Network / proxy diagnostics**. Common causes include:
 
-#### v0.8
+- DNS failure
+- HTTPS interception
+- VPN/proxy configuration
+- TLS inspection software
+- blocked access to `internetdownloadmanager.com`
 
--   Move the project to [Github](https://github.com/WindowsAddict/IDM-Activation-Script) and [massgrave.dev](https://massgrave.dev/idm-activation-script.html)
--   Minor bug fixes
--   Add info to inform users that empty registry keys are being deleted when the script deletes a lot of them
+### Signature verification fails
 
-## Screenshots
+Re-download/reinstall IDM from the official download page. Do not automatically trust an installer whose Authenticode signature is invalid or whose publisher is unexpected.
 
-![](https://massgrave.dev/images/IAS.png?raw=true)
+## Original IAS credits
 
-![](https://massgrave.dev/images/IAS_Freeze_Trial.png?raw=true)
+The legacy `IAS.cmd` code is derived from the original **IDM Activation Script (IAS)** project by WindowsAddict and retains its original inline attribution and credits.
 
-## Credits
+Original project references:
 
-|                                             |                                                                                                                                                                                                                                        |
-|----------------------|--------------------------------------------------|
-| Dukun Cabul                                 | Original researcher of this IDM trial reset and activation logic, made an Autoit tool for these methods, [IDM-AIO_2020_Final](https://nsaneforums.com/topic/371047-discussion-internet-download-manager-fixes/page/8/#comment-1632062) |
-| AveYo aka BAU                               | [reg_own lean and mean snippet](https://pastebin.com/XTPt0JSC)                                                                                                                                                                         |
-| [abbodi1406](https://github.com/abbodi1406) | Help in coding                                                                                                                                                                                                                         |
-| WindowsAddict                               | IAS Author                                                                                                                                                                                                                             |
+- <https://github.com/WindowsAddict/IDM-Activation-Script>
+- <https://massgrave.dev/idm-activation-script>
 
-And thanks to the IAS users for their interest, feedback, and assistance.
+Additional original credits listed by IAS include Dukun Cabul, AveYo/BAU, and abbodi1406.
 
-------------------------------------------------------------------------
+## Maintenance notes
 
-Made with Love ❤️
+The maintained code should prefer:
+
+- HTTPS over ping/HTTP connectivity tests
+- Runtime discovery over hard-coded IDM build numbers
+- Authenticode verification for downloaded executables
+- Read-only diagnostics before repair/reinstallation recommendations
+- Explicit exclusion of serial/license values from generated reports
+- Separate maintenance code from the legacy activation implementation
+
+See [CHANGELOG.md](CHANGELOG.md) for the restart history.

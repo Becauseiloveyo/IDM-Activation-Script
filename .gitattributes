@@ -1,3 +1,10 @@
-# IAS.cmd export-ignore
-# LICENSE export-ignore
-# README.md export-ignore
+* text=auto
+
+# Windows command scripts require CRLF for reliable cmd.exe behavior.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Documentation and metadata use LF.
+*.md text eol=lf
+.gitignore text eol=lf
+VERSION text eol=lf
