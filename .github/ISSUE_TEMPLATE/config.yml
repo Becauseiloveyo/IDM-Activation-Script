@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: IDM vendor support / FAQ
+    url: https://www.internetdownloadmanager.com/support/index.html
+    about: Use the official IDM support channel for problems in IDM itself rather than this toolbox.
+  - name: Security policy
+    url: https://github.com/Becauseiloveyo/IDM-Activation-Script/blob/main/SECURITY.md
+    about: Read the security reporting guidance before disclosing sensitive or exploitable details.

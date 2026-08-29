@@ -1,0 +1,76 @@
+name: Bug report
+description: Report a reproducible problem in the maintained IDM Toolbox
+title: "[Bug]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Do not include serial/license values, credentials, tokens, cookies, or other sensitive data.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - IDM / Windows status detection
+        - Latest-version check
+        - Signature verification
+        - Network / proxy diagnostics
+        - Browser integration diagnostics
+        - Diagnostic report
+        - Official installer download / verification
+        - Self-test / CI
+        - Documentation
+        - Other maintained toolbox code
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 24H2 build ..."
+    validations:
+      required: true
+  - type: input
+    id: idm
+    attributes:
+      label: IDM version
+      placeholder: "Example: 6.43 Build 10, or not installed"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest reliable sequence that reproduces the problem.
+      placeholder: |
+        1. Run ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior / output
+      description: Redact personal paths and sensitive values before pasting output.
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Proxy/VPN, browser versions, security software, or other relevant details.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I removed serial/license values and other sensitive data from this report.
+          required: true
+        - label: I am reporting a problem in this repository, not a vulnerability in IDM itself.
+          required: true

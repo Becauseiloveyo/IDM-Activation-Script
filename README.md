@@ -14,6 +14,8 @@ The original `IAS.cmd` activation/freeze/reset implementation is preserved as se
 - **Latest IDM compatibility:** resolved from the official IDM release page at runtime rather than hard-coded in the project
 - **Release notes:** [IDM Toolbox v2.0.0](RELEASE_NOTES_v2.0.0.md)
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md)
+- **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Security policy:** [SECURITY.md](SECURITY.md)
 
 Official IDM release history: <https://www.internetdownloadmanager.com/news.html>
 
@@ -124,15 +126,42 @@ IDM-Activation-Script/
 ├─ IAS.cmd                         Legacy IAS v1.2 activation/freeze/reset code
 ├─ IDM-Toolbox.cmd                 Maintained diagnostics/update/integrity toolbox
 ├─ README.md
+├─ CONTRIBUTING.md
+├─ SECURITY.md
 ├─ RELEASE_NOTES_v2.0.0.md
 ├─ CHANGELOG.md
 ├─ VERSION
 ├─ .github/
+│  ├─ PULL_REQUEST_TEMPLATE.md
+│  ├─ ISSUE_TEMPLATE/
+│  │  ├─ bug_report.yml
+│  │  ├─ feature_request.yml
+│  │  └─ config.yml
 │  └─ workflows/
-│     └─ toolbox-ci.yml
+│     ├─ toolbox-ci.yml
+│     └─ release.yml
 ├─ .gitattributes
 └─ .gitignore
 ```
+
+## Releases
+
+`.github/workflows/release.yml` automates GitHub releases and enforces version consistency before publishing.
+
+A release tag must match the repository `VERSION` value exactly with a leading `v`. For example, `VERSION=2.0.0` requires tag `v2.0.0`. The workflow also verifies that `IDM-Toolbox.cmd` contains the same `toolboxver`.
+
+The workflow supports both:
+
+- pushing a matching `v*` tag; and
+- manual **Run workflow** execution with a tag value.
+
+If `RELEASE_NOTES_<tag>.md` exists, it is used as the release body. Otherwise GitHub-generated notes are used. `IDM-Toolbox.cmd` is also attached as a release asset.
+
+## Contributing and issue reports
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) before submitting changes and [SECURITY.md](SECURITY.md) before reporting security-sensitive problems.
+
+Structured bug/feature issue forms are included under `.github/ISSUE_TEMPLATE/`. GitHub Issues must be enabled in the repository settings for those forms to appear.
 
 ## Legacy IAS.cmd
 
