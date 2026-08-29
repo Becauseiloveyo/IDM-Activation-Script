@@ -1,0 +1,11 @@
+# Local editor / shell history
+.Rhistory
+*.swp
+*.tmp
+
+# Generated diagnostics
+IDM-Diagnostic-*.txt
+
+# Windows metadata
+Thumbs.db
+Desktop.ini
