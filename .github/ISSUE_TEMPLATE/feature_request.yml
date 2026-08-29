@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest an improvement to the maintained IDM Toolbox
+title: "[Feature]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for diagnostics, update checks, integrity verification, browser integration, installer verification, troubleshooting, CI, and project-maintenance improvements.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What limitation or repeated task should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the behavior or interface you want.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility considerations
+      description: Note relevant Windows, IDM, browser, PowerShell, proxy, or architecture requirements.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: This request is scoped to this repository's maintained tooling or project infrastructure.
+          required: true
+        - label: The proposal does not require diagnostic reports to expose serial/license values or other sensitive data.
+          required: true
